@@ -1,0 +1,21 @@
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    int edad;
+
+    // Pedir que ingrese la edad al usuario.
+    cout << "Por favor ingresa tu edad: ";
+    cin >> edad;
+
+    // Condicional que nos indica sin eres o no mayor de edad.
+    if (edad >= 18) {
+        cout << "Bienvenido eres mayor de edad." << endl;
+    }
+    else {
+        cout << "Lo siento eres menor de edad." << endl;
+    }
+
+    return 0;
+}
