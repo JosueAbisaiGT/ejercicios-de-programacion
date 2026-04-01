@@ -1,0 +1,31 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+
+    float numero1, numero2;
+    float suma, resta, multiplicacion, division;
+
+    cout << "Ingresa un numero entero o decimal: ";
+    cin >> numero1;
+    cout << "ingresa otro numero entero o decimal:";
+    cin >> numero2;
+
+    suma = numero1 + numero2;
+    resta = numero1 - numero2;
+    multiplicacion = numero1 * numero2;
+
+    cout << "Bienvenido Los resultados son: " << endl;
+    cout << "suma: " << suma << endl;
+    cout << "resta: " << resta << endl;
+    cout << "multiplicacion: " << multiplicacion << endl;
+
+    if (numero2 != 0) {
+        division = numero1 / numero2;
+        cout << "division: " << division << endl;
+    }
+    else {
+        cout << "La division no se puede dividir por cero" << endl;
+    }
+    return 0;
+}
