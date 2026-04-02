@@ -1,0 +1,167 @@
+#include <iostream>
+#include <string>
+#include <algorithm>
+#include <cctype>
+#include <vector>
+
+using namespace std;
+
+// Verifica si un string está vacío o solo tiene espacios
+bool estaVacioOEspacios(string s) {
+    for (char c : s) {
+        if (!isspace(c)) return false;
+    }
+    return true;
+}
+
+// Verifica que solo haya letras y espacios
+bool soloLetrasYEspacios(string s) {
+    for (char c : s) {
+        if (!isalpha(c) && !isspace(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Función para obtener la primera vocal interna
+char obtenerVocal(string s) {
+    for (int i = 1; i < s.length(); i++) {
+        char c = tolower(s[i]);
+        if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u')
+            return toupper(c);
+    }
+    return 'X';
+}
+
+// Función para censurar palabras
+string censurarRFC(string rfc) {
+    vector<string> inconvenientes = {
+        "BALA","BOBO","BUEI","BUEY","CACA","CACO",
+        "CAGA","CAGO","CAJA","VACA","TAZO","MONO",
+        "COGE","COJA","COJE","COJI","COJO","CULO",
+        "FETO","GUEY","JOTO","KAKA","KOGE","KOJO",
+        "KULO","MAME","MAMO","MEAR","MEAS","MEON",
+        "MIAR","MION","MOCO","MOKO","MULA","PEDA",
+        "PEDO","PENE","PUTA","PUTO","QULO","RATA",
+        "ROBA","ROBE","ROBO","RUIN","PEPA","PITO"
+    };
+
+    string iniciales = rfc.substr(0, 4);
+    for (const string& word : inconvenientes) {
+        if (iniciales == word) {
+            rfc[2] = 'X';
+            break;
+        }
+    }
+    return rfc;
+}
+
+// Validar fecha completa
+bool fechaValida(int anio, int mes, int dia) {
+    if (mes < 1 || mes > 12) return false;
+
+    int diasMes;
+
+    switch (mes) {
+    case 2:
+        diasMes = 28;
+        break;
+    case 4: case 6: case 9: case 11:
+        diasMes = 30;
+        break;
+    default:
+        diasMes = 31;
+    }
+
+    return dia >= 1 && dia <= diasMes;
+}
+
+int main() {
+    string pApellido, mApellido, nombre, rfc = "";
+    int anioNum, mesNum, diaNum;
+
+    cout << "Generador de RFC sin Homoclave" << endl;
+
+    cin.ignore();
+
+    // Apellido paterno (obligatorio)
+    do {
+        cout << "Apellido Paterno: ";
+        getline(cin, pApellido);
+    } while (estaVacioOEspacios(pApellido) || !soloLetrasYEspacios(pApellido));
+
+    // Apellido materno (opcional)
+    do {
+        cout << "Apellido Materno (puede quedar vacio): ";
+        getline(cin, mApellido);
+
+        if (estaVacioOEspacios(mApellido)) break;
+
+    } while (!soloLetrasYEspacios(mApellido));
+
+    // Nombre (obligatorio)
+    do {
+        cout << "Nombre(s): ";
+        getline(cin, nombre);
+    } while (estaVacioOEspacios(nombre) || !soloLetrasYEspacios(nombre));
+
+    // Validar año
+    do {
+        cout << "Anio de nacimiento (4 digitos): ";
+        cin >> anioNum;
+    } while (anioNum < 1000 || anioNum > 9999);
+
+    // Validar mes
+    do {
+        cout << "Mes (1-12): ";
+        cin >> mesNum;
+    } while (mesNum < 1 || mesNum > 12);
+
+    // Validar día
+    do {
+        cout << "Dia: ";
+        cin >> diaNum;
+
+        if (!fechaValida(anioNum, mesNum, diaNum)) {
+            cout << "Fecha invalida, intenta de nuevo.\n";
+        }
+
+    } while (!fechaValida(anioNum, mesNum, diaNum));
+
+    // Convertir a mayúsculas
+    transform(pApellido.begin(), pApellido.end(), pApellido.begin(), ::toupper);
+    transform(mApellido.begin(), mApellido.end(), mApellido.begin(), ::toupper);
+    transform(nombre.begin(), nombre.end(), nombre.begin(), ::toupper);
+
+    // Tomar últimos 2 dígitos del año
+    string anio = to_string(anioNum).substr(2, 2);
+
+    // Formato mes y día
+    string mes = (mesNum < 10) ? "0" + to_string(mesNum) : to_string(mesNum);
+    string dia = (diaNum < 10) ? "0" + to_string(diaNum) : to_string(diaNum);
+
+    // --- FORMACION DEL RFC ---
+    rfc += pApellido[0];
+    rfc += obtenerVocal(pApellido);
+
+    // Apellido materno
+    if (estaVacioOEspacios(mApellido)) {
+        rfc += 'X';
+    }
+    else {
+        rfc += mApellido[0];
+    }
+
+    rfc += nombre[0];
+
+    // Censura
+    rfc = censurarRFC(rfc);
+
+    // Fecha
+    rfc += anio + mes + dia;
+
+    cout << "\nRFC Calculado: " << rfc << endl;
+
+    return 0;
+}
